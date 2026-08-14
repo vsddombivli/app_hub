@@ -166,7 +166,7 @@ document.getElementById('signOutBtn').addEventListener('click', async ()=>{
 async function init(){
   const { data: { user } } = await sb.auth.getUser();
   currentUser = user;
-  if(!user){ renderAuth(); return; }
+  if(!user){ return; }
 
   whoBox.style.display = 'flex';
   whoEmail.textContent = user.email;
