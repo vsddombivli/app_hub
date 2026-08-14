@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VSD Hub — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  :root{
+    --ink:#201a17; --canvas:#fbf8f2; --maroon:#7a1e2b; --marigold:#e1a73b;
+    --teal:#1f3d3a; --sand:#e4dcc8; --card:#ffffff; --danger:#a6303c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--canvas);color:var(--ink);font-family:'Manrope',sans-serif;}
+  header{padding:18px 22px;border-bottom:1px solid var(--sand);display:flex;align-items:center;justify-content:space-between;}
+  header h1{font-family:'Fraunces',serif;font-size:19px;margin:0;}
+  header .who{font-size:12px;color:#6b6058;}
+  header button{background:none;border:1px solid var(--sand);border-radius:8px;padding:6px 12px;font:inherit;cursor:pointer;}
+  main{max-width:920px;margin:0 auto;padding:26px 20px 80px;}
+
+  /* auth screens */
+  .auth-box{max-width:360px;margin:80px auto;background:var(--card);border:1px solid var(--sand);border-radius:14px;padding:28px;box-shadow:0 8px 24px -12px rgba(0,0,0,.15);}
+  .auth-box h2{font-family:'Fraunces',serif;margin:0 0 4px;font-size:19px;}
+  .auth-box p.sub{color:#6b6058;font-size:13px;margin:0 0 18px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:#4a4038;}
+  .field input, .field select, .field textarea{
+    width:100%;padding:9px 11px;border:1px solid var(--sand);border-radius:8px;font:inherit;background:#fff;
+  }
+  .btn{background:var(--maroon);color:#fff;border:none;border-radius:8px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer;}
+  .btn:hover{background:#631822;}
+  .btn.secondary{background:none;color:var(--maroon);border:1px solid var(--maroon);}
+  .btn.secondary:hover{background:rgba(122,30,43,.06);}
+  .btn.danger{background:var(--danger);}
+  .btn.small{padding:6px 10px;font-size:13px;}
+  .row{display:flex;gap:10px;}
+  .err{color:var(--danger);font-size:13px;margin:8px 0 0;}
+  .switch{margin-top:14px;font-size:13px;color:#6b6058;}
+  .switch a{color:var(--maroon);cursor:pointer;text-decoration:underline;}
+
+  /* toolbar */
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .toolbar .btn{display:flex;align-items:center;gap:6px;}
+
+  /* tree */
+  .tree{display:flex;flex-direction:column;gap:10px;}
+  .node{background:var(--card);border:1px solid var(--sand);border-radius:12px;padding:12px 14px;}
+  .node-row{display:flex;align-items:center;gap:10px;}
+  .node-row .icon-wrap{width:32px;height:32px;border-radius:8px;background:rgba(122,30,43,.08);color:var(--maroon);display:flex;align-items:center;justify-content:center;flex:none;}
+  .node-row .icon-wrap svg{width:17px;height:17px;}
+  .node-row .info{flex:1;min-width:0;}
+  .node-row .info .name{font-weight:600;font-size:14.5px;}
+  .node-row .info .meta{font-size:12px;color:#8a7f73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .node-row .actions{display:flex;gap:4px;flex:none;}
+  .icon-btn{background:none;border:1px solid var(--sand);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4a4038;}
+  .icon-btn:hover{border-color:var(--maroon);color:var(--maroon);}
+  .icon-btn svg{width:15px;height:15px;}
+  .children{margin:10px 0 0 20px;padding-left:16px;border-left:2px solid var(--sand);display:flex;flex-direction:column;gap:8px;}
+  .category-group{margin-bottom:22px;}
+  .category-group > h3{font-family:'Fraunces',serif;font-size:16px;color:var(--teal);margin:0 0 10px;display:flex;align-items:center;gap:8px;}
+  .category-group > h3 .rule{flex:1;height:1px;background:var(--sand);}
+  .badge{font-size:10.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:var(--sand);color:#5c5245;}
+  .badge.folder{background:rgba(31,61,58,.12);color:var(--teal);}
+  .badge.leaf{background:rgba(225,167,59,.22);color:#7a5710;}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(32,26,23,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:50;}
+  .modal{background:#fff;border-radius:14px;max-width:480px;width:100%;padding:24px;}
+  .modal h3{font-family:'Fraunces',serif;margin:0 0 16px;}
+  .icon-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-height:150px;overflow:auto;border:1px solid var(--sand);border-radius:8px;padding:8px;margin-top:6px;}
+  .icon-grid button{background:none;border:1px solid transparent;border-radius:7px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4a4038;}
+  .icon-grid button:hover{border-color:var(--marigold);}
+  .icon-grid button.selected{background:rgba(122,30,43,.1);border-color:var(--maroon);color:var(--maroon);}
+  .icon-grid svg{width:17px;height:17px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+  .hint{font-size:12px;color:#8a7f73;margin-top:4px;}
+  #hidden{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>VSD Hub — Admin</h1>
+  <div id="whoBox" style="display:none;" class="row" style="align-items:center;">
+    <span class="who" id="whoEmail" style="margin-right:10px;"></span>
+    <button id="signOutBtn">Sign out</button>
+  </div>
+</header>
+
+<main id="main">
+  <div class="auth-box" id="authBox">
+    <h2>Sign in</h2>
+    <p class="sub">Admin access to Vardhman Sanskar Dham's app hub</p>
+    <div class="field"><label>Email</label><input id="authEmail" type="email" placeholder="you@example.com"></div>
+    <div class="field"><label>Password</label><input id="authPassword" type="password" placeholder="••••••••"></div>
+    <button class="btn" id="signInBtn" style="width:100%;">Sign in</button>
+    <p class="err" id="authErr"></p>
+    <p class="switch">No account yet? <a id="showSignUp">Create one</a></p>
+  </div>
+</main>
+
+<script>
+// ---- CONFIGURE THIS ------------------------------------------------
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+// ---------------------------------------------------------------------
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const main = document.getElementById('main');
+const whoBox = document.getElementById('whoBox');
+const whoEmail = document.getElementById('whoEmail');
+
+const COMMON_ICONS = [
+  'app-window','receipt','gift','users','user-check','monitor','clipboard-list','trophy','map-pin',
+  'truck','shopping-cart','heart','flame','book-open','award','star','gamepad-2','tv','mic','camera',
+  'image','badge-check','package','warehouse','calendar','list-checks','vote','dice-5','sparkles',
+  'landmark','building-2','bell','megaphone','ticket','wallet','banknote','handshake','folder',
+  'layout-grid','settings','id-card','scan-line','printer','send','shield-check','baby','crown'
+];
+
+let allTiles = [];
+let currentUser = null;
+let isAdmin = false;
+
+// ---------------- AUTH -----------------------------------------------
+document.getElementById('signInBtn').addEventListener('click', async ()=>{
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authErr');
+  errEl.textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if(error){ errEl.textContent = error.message; return; }
+  init();
+});
+
+document.getElementById('showSignUp').addEventListener('click', ()=>{
+  document.getElementById('authBox').innerHTML = `
+    <h2>Create account</h2>
+    <p class="sub">You'll still need to be approved as an admin before you can edit tiles.</p>
+    <div class="field"><label>Email</label><input id="suEmail" type="email"></div>
+    <div class="field"><label>Password</label><input id="suPassword" type="password" placeholder="min 6 characters"></div>
+    <button class="btn" id="suBtn" style="width:100%;">Create account</button>
+    <p class="err" id="suErr"></p>
+  `;
+  document.getElementById('suBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('suEmail').value.trim();
+    const password = document.getElementById('suPassword').value;
+    const errEl = document.getElementById('suErr');
+    const { error } = await sb.auth.signUp({ email, password });
+    if(error){ errEl.textContent = error.message; return; }
+    errEl.style.color = 'var(--teal)';
+    errEl.textContent = 'Account created. Ask an existing admin to approve you (see README), then sign in.';
+  });
+});
+
+document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+  await sb.auth.signOut();
+  location.reload();
+});
+
+async function init(){
+  const { data: { user } } = await sb.auth.getUser();
+  currentUser = user;
+  if(!user){ renderAuth(); return; }
+
+  whoBox.style.display = 'flex';
+  whoEmail.textContent = user.email;
+
+  const { data: adminRow } = await sb.from('admins').select('id').eq('id', user.id).maybeSingle();
+  isAdmin = !!adminRow;
+
+  if(!isAdmin){
+    main.innerHTML = `<div class="auth-box"><h2>Signed in, not approved yet</h2>
+      <p class="sub">Your account (${escapeHtml(user.email)}) isn't on the admin allowlist yet. Ask an existing admin to add you — see README for the SQL snippet.</p></div>`;
+    return;
+  }
+
+  await loadTiles();
+  renderApp();
+}
+
+function renderAuth(){
+  main.innerHTML = document.getElementById('authBox').outerHTML;
+  // re-bind since we replaced innerHTML wholesale on first load only; init() runs once at start
+}
+
+// ---------------- DATA -------------------------------------------------
+async function loadTiles(){
+  const { data, error } = await sb.from('tiles').select('*').order('sort_order');
+  if(error){ alert('Failed to load tiles: ' + error.message); return; }
+  allTiles = data;
+}
+
+function childrenOf(id){
+  return allTiles.filter(t => t.parent_id === id).sort((a,b)=>a.sort_order-b.sort_order);
+}
+function categories(){
+  return [...new Set(allTiles.filter(t=>t.parent_id===null).map(t=>t.category))].sort();
+}
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function descendantIds(id){
+  // used to prevent choosing a tile's own descendant as its parent
+  const kids = childrenOf(id);
+  return kids.reduce((acc,k)=>acc.concat(k.id, descendantIds(k.id)), []);
+}
+
+// ---------------- RENDER APP -------------------------------------------
+function renderApp(){
+  main.innerHTML = `
+    <div class="toolbar">
+      <div><strong>${allTiles.length}</strong> tiles across <strong>${categories().length}</strong> categories</div>
+      <button class="btn" id="addRootBtn"><i data-lucide="plus"></i> Add top-level tile</button>
+    </div>
+    <div id="treeRoot"></div>
+  `;
+  document.getElementById('addRootBtn').addEventListener('click', ()=> openEditor({ parent_id: null }));
+
+  const treeRoot = document.getElementById('treeRoot');
+  const cats = categories();
+  if(cats.length === 0){
+    treeRoot.innerHTML = `<p style="color:#8a7f73;">No tiles yet. Add your first top-level tile to get started.</p>`;
+  }
+  cats.forEach(cat=>{
+    const group = document.createElement('div');
+    group.className = 'category-group';
+    group.innerHTML = `<h3>${escapeHtml(cat)}<div class="rule"></div></h3>`;
+    const tree = document.createElement('div');
+    tree.className = 'tree';
+    const roots = allTiles.filter(t=>t.parent_id===null && t.category===cat).sort((a,b)=>a.sort_order-b.sort_order);
+    roots.forEach(t => tree.appendChild(buildNode(t)));
+    group.appendChild(tree);
+    treeRoot.appendChild(group);
+  });
+  lucide.createIcons();
+}
+
+function buildNode(tile){
+  const isFolder = !tile.url;
+  const kids = childrenOf(tile.id);
+  const wrap = document.createElement('div');
+  wrap.className = 'node';
+  wrap.innerHTML = `
+    <div class="node-row">
+      <div class="icon-wrap"><i data-lucide="${tile.icon}"></i></div>
+      <div class="info">
+        <div class="name">${escapeHtml(tile.name)} <span class="badge ${isFolder?'folder':'leaf'}">${isFolder?'folder':'link'}</span></div>
+        <div class="meta">${isFolder ? (kids.length + ' item' + (kids.length===1?'':'s') + ' inside') : escapeHtml(tile.url)}</div>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" data-act="up" title="Move up"><i data-lucide="chevron-up"></i></button>
+        <button class="icon-btn" data-act="down" title="Move down"><i data-lucide="chevron-down"></i></button>
+        <button class="icon-btn" data-act="addchild" title="Add sub-tile"><i data-lucide="folder-plus"></i></button>
+        <button class="icon-btn" data-act="edit" title="Edit"><i data-lucide="pencil"></i></button>
+        <button class="icon-btn" data-act="delete" title="Delete"><i data-lucide="trash-2"></i></button>
+      </div>
+    </div>
+    <div class="children" id="children-${tile.id}"></div>
+  `;
+  wrap.querySelector('[data-act="up"]').addEventListener('click', ()=> reorder(tile, -1));
+  wrap.querySelector('[data-act="down"]').addEventListener('click', ()=> reorder(tile, 1));
+  wrap.querySelector('[data-act="addchild"]').addEventListener('click', ()=> openEditor({ parent_id: tile.id }, tile));
+  wrap.querySelector('[data-act="edit"]').addEventListener('click', ()=> openEditor(tile));
+  wrap.querySelector('[data-act="delete"]').addEventListener('click', ()=> deleteTile(tile));
+
+  const childrenBox = wrap.querySelector('.children');
+  if(kids.length){
+    kids.forEach(k => childrenBox.appendChild(buildNode(k)));
+  } else {
+    childrenBox.remove();
+  }
+  return wrap;
+}
+
+async function reorder(tile, dir){
+  const siblings = childrenOf(tile.parent_id).sort((a,b)=>a.sort_order-b.sort_order);
+  const idx = siblings.findIndex(s=>s.id===tile.id);
+  const swapWith = siblings[idx+dir];
+  if(!swapWith) return;
+  const a = tile.sort_order, b = swapWith.sort_order;
+  await sb.from('tiles').update({ sort_order: b }).eq('id', tile.id);
+  await sb.from('tiles').update({ sort_order: a }).eq('id', swapWith.id);
+  await loadTiles(); renderApp();
+}
+
+async function deleteTile(tile){
+  const kids = childrenOf(tile.id);
+  const msg = kids.length
+    ? `Delete "${tile.name}" and everything inside it (${kids.length} item${kids.length===1?'':'s'})? This can't be undone.`
+    : `Delete "${tile.name}"? This can't be undone.`;
+  if(!confirm(msg)) return;
+  const { error } = await sb.from('tiles').delete().eq('id', tile.id);
+  if(error){ alert('Delete failed: ' + error.message); return; }
+  await loadTiles(); renderApp();
+}
+
+// ---------------- EDITOR MODAL ------------------------------------------
+function openEditor(tileOrDraft, parentTileIfAny){
+  const isNew = !tileOrDraft.id;
+  const isRoot = tileOrDraft.parent_id === null || tileOrDraft.parent_id === undefined;
+  const existingCats = categories();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>${isNew ? 'Add tile' : 'Edit tile'}</h3>
+      ${parentTileIfAny ? `<p class="hint" style="margin-bottom:12px;">Inside "${escapeHtml(parentTileIfAny.name)}"</p>` : ''}
+      <div class="field"><label>Name</label><input id="f_name" value="${escapeHtml(tileOrDraft.name||'')}" placeholder="e.g. Kaun Banega Gyani"></div>
+      ${isRoot ? `
+        <div class="field">
+          <label>Category</label>
+          <input id="f_category" list="catList" value="${escapeHtml(tileOrDraft.category||'')}" placeholder="e.g. Games, Jivdaya, Logistics">
+          <datalist id="catList">${existingCats.map(c=>`<option value="${escapeHtml(c)}">`).join('')}</datalist>
+        </div>` : ''}
+      <div class="field">
+        <label>Link URL <span class="hint" style="display:inline;">(leave blank to make this a folder of sub-tiles)</span></label>
+        <input id="f_url" value="${escapeHtml(tileOrDraft.url||'')}" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label>Icon</label>
+        <input id="f_icon" value="${escapeHtml(tileOrDraft.icon||'app-window')}" placeholder="lucide icon name, e.g. trophy">
+        <div class="icon-grid" id="iconGrid"></div>
+        <p class="hint">Browse all icon names at lucide.dev/icons — type any valid name above.</p>
+      </div>
+      <p class="err" id="f_err"></p>
+      <div class="modal-actions">
+        <button class="btn secondary" id="cancelBtn">Cancel</button>
+        <button class="btn" id="saveBtn">${isNew ? 'Add tile' : 'Save changes'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const iconGrid = overlay.querySelector('#iconGrid');
+  const iconInput = overlay.querySelector('#f_icon');
+  function paintGrid(){
+    iconGrid.innerHTML = COMMON_ICONS.map(name =>
+      `<button type="button" data-icon="${name}" class="${iconInput.value===name?'selected':''}" title="${name}"><i data-lucide="${name}"></i></button>`
+    ).join('');
+    lucide.createIcons();
+    iconGrid.querySelectorAll('button').forEach(b=>{
+      b.addEventListener('click', ()=>{ iconInput.value = b.dataset.icon; paintGrid(); });
+    });
+  }
+  paintGrid();
+  iconInput.addEventListener('input', paintGrid);
+
+  overlay.querySelector('#cancelBtn').addEventListener('click', ()=> overlay.remove());
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+
+  overlay.querySelector('#saveBtn').addEventListener('click', async ()=>{
+    const errEl = overlay.querySelector('#f_err');
+    const name = overlay.querySelector('#f_name').value.trim();
+    const url = overlay.querySelector('#f_url').value.trim();
+    const icon = iconInput.value.trim() || 'app-window';
+    const categoryEl = overlay.querySelector('#f_category');
+    const category = categoryEl ? categoryEl.value.trim() : null;
+
+    if(!name){ errEl.textContent = 'Name is required.'; return; }
+    if(isRoot && !category){ errEl.textContent = 'Top-level tiles need a category.'; return; }
+
+    const payload = {
+      name,
+      url: url || null,
+      icon,
+      parent_id: isRoot ? null : tileOrDraft.parent_id,
+      category: isRoot ? category : null,
+    };
+
+    if(isNew){
+      const siblings = childrenOf(payload.parent_id);
+      payload.sort_order = siblings.length ? Math.max(...siblings.map(s=>s.sort_order)) + 1 : 0;
+      const { error } = await sb.from('tiles').insert(payload);
+      if(error){ errEl.textContent = error.message; return; }
+    } else {
+      const { error } = await sb.from('tiles').update(payload).eq('id', tileOrDraft.id);
+      if(error){ errEl.textContent = error.message; return; }
+    }
+    overlay.remove();
+    await loadTiles(); renderApp();
+  });
+}
+
+init();
+</script>
+</body>
+</html>
