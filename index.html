@@ -2,152 +2,243 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#7a1e2b" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Vardhman Sanskar Dham — App Hub</title>
+<link rel="icon" href="images/guru-logo.png">
+<link rel="apple-touch-icon" href="images/guru-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <style>
   :root{
-    --ink:#201a17;
-    --canvas:#fbf8f2;
-    --maroon:#7a1e2b;
-    --maroon-dim:#8f3341;
-    --marigold:#e1a73b;
-    --teal:#1f3d3a;
-    --sand:#e4dcc8;
+    --ink:#241a15;
+    --ink-soft:#6b5c50;
+    --canvas:#fbf6ec;
+    --maroon:#8a1f22;
+    --maroon-dim:#6c161c;
+    --marigold:#e89a2c;
+    --gold-light:#f6c977;
+    --teal:#2a4a44;
+    --sand:#ecdfc5;
     --card:#ffffff;
-    --shadow: 0 1px 2px rgba(32,26,23,.06), 0 8px 24px -12px rgba(32,26,23,.18);
+    --shadow-sm: 0 1px 2px rgba(36,26,21,.05);
+    --shadow-md: 0 10px 28px -14px rgba(36,26,21,.28);
+    --shadow-lg: 0 18px 44px -18px rgba(36,26,21,.35);
+    --radius: 18px;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
   body{
     margin:0;
     background:var(--canvas);
     color:var(--ink);
     font-family:'Manrope',sans-serif;
     -webkit-font-smoothing:antialiased;
+    padding-bottom:env(safe-area-inset-bottom);
+    overflow-x:hidden;
   }
-  header{
-    padding:28px 20px 18px;
-    border-bottom:1px solid var(--sand);
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
     background:
-      radial-gradient(1200px 300px at 20% -60%, rgba(225,167,59,.12), transparent),
-      var(--canvas);
+      radial-gradient(120% 90% at 50% -20%, #fff3d9 0%, transparent 55%),
+      linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dim) 100%);
+    padding:calc(env(safe-area-inset-top) + 18px) 20px 0;
+    overflow:hidden;
   }
-  .brand{
-    display:flex; align-items:center; gap:14px; max-width:1100px; margin:0 auto;
+  .hero::after{
+    content:'';
+    position:absolute; inset:auto 0 0 0; height:36px;
+    background:var(--canvas);
+    border-radius:28px 28px 0 0;
   }
-  .brand-mark{
-    width:44px;height:44px;border-radius:12px 12px 4px 12px;
-    background:linear-gradient(160deg, var(--maroon), var(--maroon-dim));
-    display:flex;align-items:center;justify-content:center;color:var(--marigold);
-    flex:none;
+  .hero-inner{
+    position:relative; z-index:1;
+    max-width:640px; margin:0 auto;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding-bottom:26px;
   }
-  .brand h1{
-    font-family:'Fraunces',serif; font-weight:600; font-size:22px; margin:0; letter-spacing:.2px;
+  .logo-frame{
+    width:132px; height:132px; border-radius:50%;
+    background:#fffaf0;
+    padding:5px;
+    box-shadow:var(--shadow-lg), 0 0 0 3px rgba(246,201,119,.55);
+    margin-bottom:14px;
+    animation:rise .5s ease both;
   }
-  .brand p{ margin:2px 0 0; font-size:13px; color:#6b6058; }
+  .logo-frame img{
+    width:100%; height:100%; border-radius:50%; object-fit:cover; display:block;
+    object-position:50% 30%;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif; font-weight:700; font-size:22px; color:#fff;
+    margin:0 0 4px; letter-spacing:.2px; animation:rise .5s .05s ease both;
+  }
+  .hero p{
+    margin:0; font-size:13.5px; color:rgba(255,255,255,.82); font-weight:500;
+    animation:rise .5s .1s ease both;
+  }
+  @keyframes rise{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- CATEGORY QUICK NAV ---------- */
+  .quicknav-wrap{
+    background:var(--canvas);
+    position:sticky; top:0; z-index:20;
+    padding:10px 0 8px;
+    box-shadow:0 6px 14px -10px rgba(36,26,21,.18);
+  }
+  .quicknav{
+    display:flex; gap:8px; overflow-x:auto; padding:0 16px;
+    scrollbar-width:none;
+  }
+  .quicknav::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:none; display:flex; align-items:center; gap:6px;
+    background:var(--card); border:1px solid var(--sand); color:var(--ink);
+    font-size:13px; font-weight:600; padding:8px 14px; border-radius:999px;
+    cursor:pointer; white-space:nowrap; transition:.15s ease;
+    box-shadow:var(--shadow-sm);
+  }
+  .chip.active{ background:var(--maroon); border-color:var(--maroon); color:#fff; }
+  .chip iconify-icon{ font-size:15px; }
+
+  /* ---------- CRUMBS ---------- */
   #crumbBar{
-    max-width:1100px;margin:14px auto 0; display:none; align-items:center; gap:6px;
-    font-size:13px; color:#6b6058;
+    max-width:680px;margin:0 auto; display:none; align-items:center; gap:6px; flex-wrap:wrap;
+    font-size:13px; color:var(--ink-soft); padding:14px 20px 0;
   }
   #crumbBar button{
-    background:none;border:none;font:inherit;color:var(--maroon);cursor:pointer;padding:2px 4px;
-    border-radius:6px;
+    background:none;border:none;font:inherit;color:var(--maroon);cursor:pointer;padding:3px 6px;
+    border-radius:6px; font-weight:600;
   }
-  #crumbBar button:hover{background:var(--sand);}
-  #crumbBar .sep{color:#c9bfae;}
-  main{ max-width:1100px; margin:0 auto; padding:28px 20px 80px; }
-  .category{ margin-bottom:34px; }
+  #crumbBar button:active{background:var(--sand);}
+  #crumbBar .sep{color:#d3c4a6;}
+
+  main{ max-width:680px; margin:0 auto; padding:18px 16px 60px; }
+
+  .category{ margin-bottom:30px; }
   .category-head{
-    display:flex; align-items:baseline; gap:10px; margin-bottom:14px;
+    display:flex; align-items:center; gap:10px; margin-bottom:14px; scroll-margin-top:64px;
+  }
+  .category-head .dot{
+    width:8px;height:8px;border-radius:50%;background:var(--marigold); flex:none;
   }
   .category-head h2{
-    font-family:'Fraunces',serif; font-weight:600; font-size:18px; margin:0; color:var(--teal);
+    font-family:'Fraunces',serif; font-weight:600; font-size:17px; margin:0; color:var(--teal);
   }
   .category-head .rule{ flex:1; height:1px; background:var(--sand); }
+
   .grid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px;
   }
+
   .tile{
     background:var(--card);
     border:1px solid var(--sand);
-    border-radius:16px 16px 6px 16px;
-    padding:18px 14px;
-    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+    border-radius:var(--radius);
+    padding:16px 10px 12px;
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:9px;
     cursor:pointer; text-decoration:none; color:inherit;
-    box-shadow:var(--shadow);
-    transition:transform .12s ease, border-color .12s ease;
-    min-height:108px;
+    box-shadow:var(--shadow-sm);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     position:relative;
+    -webkit-user-select:none; user-select:none;
   }
-  .tile:hover{ transform:translateY(-2px); border-color:var(--marigold); }
+  .tile:active{ transform:scale(.96); box-shadow:var(--shadow-sm); }
+  @media (hover:hover){
+    .tile:hover{ transform:translateY(-3px); box-shadow:var(--shadow-md); border-color:var(--gold-light); }
+  }
   .tile:focus-visible{ outline:2px solid var(--maroon); outline-offset:2px; }
   .tile .icon-wrap{
-    width:38px;height:38px;border-radius:10px;
-    background:linear-gradient(160deg, rgba(122,30,43,.08), rgba(225,167,59,.16));
+    width:48px;height:48px;border-radius:14px;
+    background:linear-gradient(160deg, rgba(138,31,34,.09), rgba(232,154,44,.20));
     display:flex;align-items:center;justify-content:center;color:var(--maroon);
+    flex:none;
   }
-  .tile .icon-wrap svg{ width:20px;height:20px; }
-  .tile .name{ font-weight:600; font-size:14.5px; line-height:1.3; }
+  .tile .icon-wrap iconify-icon{ font-size:24px; }
+  .tile .name{ font-weight:700; font-size:12.5px; line-height:1.3; color:var(--ink); }
   .tile .folder-badge{
-    position:absolute; top:12px; right:12px; color:#a9a094;
+    position:absolute; top:8px; right:8px; color:#c7b593; font-size:13px; display:flex;
   }
-  .tile .folder-badge svg{ width:15px;height:15px; }
+
   #empty{
-    text-align:center; padding:60px 20px; color:#8a7f73;
+    text-align:center; padding:70px 20px; color:var(--ink-soft);
   }
-  #empty .icon-wrap{ margin:0 auto 12px; width:48px;height:48px; }
+  #empty .icon-wrap{
+    margin:0 auto 14px; width:56px;height:56px; border-radius:16px;
+    background:var(--sand); color:#a9906a; display:flex; align-items:center; justify-content:center;
+  }
+  #empty .icon-wrap iconify-icon{ font-size:26px; }
+  #empty p{ margin:0; font-size:14px; }
+
+  /* skeleton loading */
+  .skeleton-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:12px; }
+  .skel-tile{
+    height:96px; border-radius:var(--radius); background:linear-gradient(100deg, var(--sand) 20%, #f5ead0 40%, var(--sand) 60%);
+    background-size:200% 100%; animation:shimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
   footer{
-    text-align:center; padding:20px; font-size:12px; color:#a9a094;
+    text-align:center; padding:24px 20px calc(24px + env(safe-area-inset-bottom));
+    font-size:11.5px; color:#b3a68f; display:flex; align-items:center; justify-content:center; gap:6px;
   }
-  @media (max-width:420px){
-    .grid{ grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); }
-  }
+  footer iconify-icon{ font-size:13px; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <div class="brand-mark">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l7 6v12H5V8l7-6z"/></svg>
-    </div>
-    <div>
-      <h1>Vardhman Sanskar Dham</h1>
-      <p>Volunteer app hub — everything in one place</p>
-    </div>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="logo-frame"><img src="images/guru-logo.png" alt="Vardhman Sanskar Dham"></div>
+    <h1>Vardhman Sanskar Dham</h1>
+    <p>Volunteer app hub — everything in one place</p>
   </div>
+</div>
+
+<div class="quicknav-wrap">
   <div id="crumbBar"></div>
-</header>
+  <div class="quicknav" id="quicknav"></div>
+</div>
 
 <main id="main">
-  <p style="text-align:center;color:#a9a094;padding:60px 0;">Loading…</p>
+  <div class="skeleton-grid">
+    <div class="skel-tile"></div><div class="skel-tile"></div><div class="skel-tile"></div>
+    <div class="skel-tile"></div><div class="skel-tile"></div><div class="skel-tile"></div>
+  </div>
 </main>
 
-<footer>Configuration is managed by the admin team · vsd-hub</footer>
+<footer><iconify-icon icon="mdi:hand-heart-outline"></iconify-icon> Configuration managed by the admin team</footer>
 
 <script>
-// ====== CONFIGURE THESE ======
-const SUPABASE_URL = "https://npaikbbvarcsxykmogeo.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wYWlrYmJ2YXJjc3h5a21vZ2VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTcxNzIsImV4cCI6MjA5OTkzMzE3Mn0.zwIfRfHttsYmATkl751GWa1VJE2qUgN5Jxq53tNYSpM";
-// ==============================
+// ---- CONFIGURE THIS ------------------------------------------------
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+// ---------------------------------------------------------------------
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: { schema: 'vsd_hub' }
 });
 const main = document.getElementById('main');
 const crumbBar = document.getElementById('crumbBar');
+const quicknav = document.getElementById('quicknav');
 
 let allTiles = [];
 let stack = []; // stack of tile ids representing current drill-down path
 
-function iconSvg(name){
-  const key = (name || 'app-window').trim();
-  const el = document.createElement('div');
-  el.innerHTML = `<i data-lucide="${key}"></i>`;
-  return el.innerHTML;
+// category -> icon shown in the quick-nav chip (falls back to the first
+// tile's icon in that category if not listed here)
+const CATEGORY_ICON_FALLBACK = 'mdi:shape-outline';
+
+function iconTag(name, extraAttrs=''){
+  const key = (name || 'mdi:apps').trim();
+  return `<iconify-icon icon="${key}" ${extraAttrs}></iconify-icon>`;
 }
 
 function childrenOf(id){
@@ -162,13 +253,38 @@ function categories(){
   return cats.sort((a,b)=>a.localeCompare(b));
 }
 
+function categoryIcon(cat){
+  const first = allTiles.find(t => t.parent_id===null && t.category===cat);
+  return first ? first.icon : CATEGORY_ICON_FALLBACK;
+}
+
+function renderQuicknav(){
+  if(stack.length > 0){ quicknav.style.display = 'none'; return; }
+  const cats = categories();
+  if(cats.length === 0){ quicknav.style.display = 'none'; return; }
+  quicknav.style.display = 'flex';
+  quicknav.innerHTML = cats.map(cat => `
+    <button class="chip" data-cat="${escapeHtml(cat)}">
+      ${iconTag(categoryIcon(cat))}<span>${escapeHtml(cat)}</span>
+    </button>
+  `).join('');
+  quicknav.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const id = 'cat-' + slug(chip.dataset.cat);
+      document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+}
+
+function slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+
 function renderCrumbs(){
   if(stack.length === 0){ crumbBar.style.display = 'none'; crumbBar.innerHTML=''; return; }
   crumbBar.style.display = 'flex';
   const path = [{id:null,label:'All apps'}, ...stack.map(id => ({id, label: allTiles.find(t=>t.id===id)?.name || ''}))];
   crumbBar.innerHTML = path.map((p,i) => {
     const isLast = i === path.length-1;
-    const label = isLast ? `<strong style="color:var(--ink)">${p.label}</strong>` : `<button data-jump="${i}">${p.label}</button>`;
+    const label = isLast ? `<strong style="color:var(--ink)">${escapeHtml(p.label)}</strong>` : `<button data-jump="${i}">${escapeHtml(p.label)}</button>`;
     return i === 0 ? label : `<span class="sep">/</span>${label}`;
   }).join('');
   crumbBar.querySelectorAll('button[data-jump]').forEach(btn=>{
@@ -191,12 +307,12 @@ function tileEl(tile){
     wrapper.rel = 'noopener';
   }
   wrapper.innerHTML = `
-    <div class="icon-wrap">${iconSvg(tile.icon)}</div>
+    <div class="icon-wrap">${iconTag(tile.icon)}</div>
     <div class="name">${escapeHtml(tile.name)}</div>
-    ${isFolder ? `<div class="folder-badge"><i data-lucide="corner-down-right"></i></div>` : ''}
+    ${isFolder ? `<div class="folder-badge">${iconTag('mdi:subdirectory-arrow-right')}</div>` : ''}
   `;
   if(isFolder){
-    wrapper.addEventListener('click', ()=>{ stack.push(tile.id); render(); });
+    wrapper.addEventListener('click', ()=>{ stack.push(tile.id); render(); window.scrollTo({top:0, behavior:'smooth'}); });
     wrapper.addEventListener('keydown', e=>{ if(e.key==='Enter'){ stack.push(tile.id); render(); } });
   }
   return wrapper;
@@ -206,22 +322,26 @@ function escapeHtml(s){
   return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function emptyState(msg){
+  return `<div id="empty"><div class="icon-wrap">${iconTag('mdi:inbox-outline')}</div><p>${escapeHtml(msg)}</p></div>`;
+}
+
 function render(){
   renderCrumbs();
+  renderQuicknav();
   main.innerHTML = '';
 
   if(stack.length === 0){
-    // top level: group by category
     const cats = categories();
     if(cats.length === 0){
-      main.innerHTML = `<div id="empty"><div class="icon-wrap" style="background:var(--sand);color:#a9a094;"><i data-lucide="inbox"></i></div>No apps configured yet.</div>`;
-      lucide.createIcons();
+      main.innerHTML = emptyState('No apps configured yet.');
       return;
     }
     cats.forEach(cat=>{
       const section = document.createElement('div');
       section.className = 'category';
-      section.innerHTML = `<div class="category-head"><h2>${escapeHtml(cat)}</h2><div class="rule"></div></div>`;
+      section.id = 'cat-' + slug(cat);
+      section.innerHTML = `<div class="category-head"><span class="dot"></span><h2>${escapeHtml(cat)}</h2><div class="rule"></div></div>`;
       const grid = document.createElement('div');
       grid.className = 'grid';
       const tiles = allTiles.filter(t=>t.parent_id===null && t.category===cat)
@@ -233,23 +353,21 @@ function render(){
   } else {
     const currentId = stack[stack.length-1];
     const kids = childrenOf(currentId);
-    const grid = document.createElement('div');
-    grid.className = 'grid';
     if(kids.length === 0){
-      main.innerHTML = `<div id="empty"><div class="icon-wrap" style="background:var(--sand);color:#a9a094;"><i data-lucide="inbox"></i></div>Nothing inside this yet.</div>`;
-      lucide.createIcons();
+      main.innerHTML = emptyState('Nothing inside this yet.');
       return;
     }
+    const grid = document.createElement('div');
+    grid.className = 'grid';
     kids.forEach(t => grid.appendChild(tileEl(t)));
     main.appendChild(grid);
   }
-  lucide.createIcons();
 }
 
 async function load(){
   const { data, error } = await sb.from('tiles').select('*');
   if(error){
-    main.innerHTML = `<div id="empty">Couldn't load apps: ${escapeHtml(error.message)}</div>`;
+    main.innerHTML = emptyState("Couldn't load apps: " + error.message);
     return;
   }
   allTiles = data;
