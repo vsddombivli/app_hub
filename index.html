@@ -49,20 +49,12 @@
     background:
       radial-gradient(120% 90% at 50% -20%, #fff3d9 0%, transparent 55%),
       linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dim) 100%);
-    padding:calc(env(safe-area-inset-top) + 18px) 20px 0;
-    overflow:hidden;
-  }
-  .hero::after{
-    content:'';
-    position:absolute; inset:auto 0 0 0; height:36px;
-    background:var(--canvas);
-    border-radius:28px 28px 0 0;
+    padding:calc(env(safe-area-inset-top) + 18px) 20px 34px;
+    border-radius:0 0 28px 28px;
   }
   .hero-inner{
-    position:relative; z-index:1;
     max-width:640px; margin:0 auto;
     display:flex; flex-direction:column; align-items:center; text-align:center;
-    padding-bottom:26px;
   }
   .logo-frame{
     width:132px; height:132px; border-radius:50%;
@@ -237,7 +229,14 @@ let stack = []; // stack of tile ids representing current drill-down path
 const CATEGORY_ICON_FALLBACK = 'mdi:shape-outline';
 
 function iconTag(name, extraAttrs=''){
-  const key = (name || 'mdi:apps').trim();
+  let key = (name || 'mdi:apps').trim();
+  // Legacy data from admin.html may still store bare Lucide-style names
+  // (e.g. "receipt") with no "prefix:" — Iconify can't resolve those, so
+  // default them into the Material Design Icons set, where many common
+  // words happen to exist under the same name. Not guaranteed for every
+  // old name, but recovers most of them until tiles are re-picked in the
+  // (now Iconify-based) admin console.
+  if(key && !key.includes(':')) key = 'mdi:' + key;
   return `<iconify-icon icon="${key}" ${extraAttrs}></iconify-icon>`;
 }
 
