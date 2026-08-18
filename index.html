@@ -209,12 +209,12 @@
 <footer><iconify-icon icon="mdi:hand-heart-outline"></iconify-icon> Configuration managed by the admin team</footer>
 
 <script>
-// ====== CONFIGURE THESE ======
-const SUPABASE_URL = "https://npaikbbvarcsxykmogeo.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wYWlrYmJ2YXJjc3h5a21vZ2VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTcxNzIsImV4cCI6MjA5OTkzMzE3Mn0.zwIfRfHttsYmATkl751GWa1VJE2qUgN5Jxq53tNYSpM";
-// ==============================
+// ---- CONFIGURE THIS ------------------------------------------------
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+// ---------------------------------------------------------------------
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: { schema: 'vsd_hub' }
 });
 const main = document.getElementById('main');
@@ -228,15 +228,27 @@ let stack = []; // stack of tile ids representing current drill-down path
 // tile's icon in that category if not listed here)
 const CATEGORY_ICON_FALLBACK = 'mdi:shape-outline';
 
+// Old admin.html (pre-Iconify) saved bare Lucide-style names. Lucide and
+// the Material Design Icons set don't share naming conventions for the
+// same concept, so a simple "mdi:" prefix only fixes names that happen
+// to coincide. This maps the rest explicitly.
+const LEGACY_ICON_MAP = {
+  'app-window':'mdi:application-outline','users':'mdi:account-group','user-check':'mdi:account-check',
+  'clipboard-list':'mdi:clipboard-text-outline','gamepad-2':'mdi:gamepad-variant','layout-grid':'mdi:view-grid',
+  'scan-line':'mdi:line-scan','id-card':'mdi:card-account-details','list-checks':'mdi:format-list-checks',
+  'badge-check':'mdi:check-decagram','banknote':'mdi:cash','baby':'mdi:baby-face-outline',
+  'building-2':'mdi:office-building','sparkles':'mdi:creation','award':'mdi:trophy-award','mic':'mdi:microphone',
+  'package':'mdi:package-variant','shopping-cart':'mdi:cart','flame':'mdi:fire','map-pin':'mdi:map-marker',
+  'landmark':'mdi:bank','corner-down-right':'mdi:subdirectory-arrow-right','inbox':'mdi:inbox-outline',
+};
+
 function iconTag(name, extraAttrs=''){
   let key = (name || 'mdi:apps').trim();
-  // Legacy data from admin.html may still store bare Lucide-style names
-  // (e.g. "receipt") with no "prefix:" — Iconify can't resolve those, so
-  // default them into the Material Design Icons set, where many common
-  // words happen to exist under the same name. Not guaranteed for every
-  // old name, but recovers most of them until tiles are re-picked in the
-  // (now Iconify-based) admin console.
-  if(key && !key.includes(':')) key = 'mdi:' + key;
+  if(LEGACY_ICON_MAP[key]){
+    key = LEGACY_ICON_MAP[key];
+  } else if(key && !key.includes(':')){
+    key = 'mdi:' + key;
+  }
   return `<iconify-icon icon="${key}" ${extraAttrs}></iconify-icon>`;
 }
 

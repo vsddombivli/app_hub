@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <style>
   :root{
     --ink:#201a17; --canvas:#fbf8f2; --maroon:#7a1e2b; --marigold:#e1a73b;
@@ -50,14 +50,14 @@
   .node{background:var(--card);border:1px solid var(--sand);border-radius:12px;padding:12px 14px;}
   .node-row{display:flex;align-items:center;gap:10px;}
   .node-row .icon-wrap{width:32px;height:32px;border-radius:8px;background:rgba(122,30,43,.08);color:var(--maroon);display:flex;align-items:center;justify-content:center;flex:none;}
-  .node-row .icon-wrap svg{width:17px;height:17px;}
+  .node-row .icon-wrap iconify-icon{font-size:17px;}
   .node-row .info{flex:1;min-width:0;}
   .node-row .info .name{font-weight:600;font-size:14.5px;}
   .node-row .info .meta{font-size:12px;color:#8a7f73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .node-row .actions{display:flex;gap:4px;flex:none;}
   .icon-btn{background:none;border:1px solid var(--sand);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4a4038;}
   .icon-btn:hover{border-color:var(--maroon);color:var(--maroon);}
-  .icon-btn svg{width:15px;height:15px;}
+  .icon-btn iconify-icon{font-size:15px;}
   .children{margin:10px 0 0 20px;padding-left:16px;border-left:2px solid var(--sand);display:flex;flex-direction:column;gap:8px;}
   .category-group{margin-bottom:22px;}
   .category-group > h3{font-family:'Fraunces',serif;font-size:16px;color:var(--teal);margin:0 0 10px;display:flex;align-items:center;gap:8px;}
@@ -74,7 +74,7 @@
   .icon-grid button{background:none;border:1px solid transparent;border-radius:7px;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4a4038;}
   .icon-grid button:hover{border-color:var(--marigold);}
   .icon-grid button.selected{background:rgba(122,30,43,.1);border-color:var(--maroon);color:var(--maroon);}
-  .icon-grid svg{width:17px;height:17px;}
+  .icon-grid svg, .icon-grid iconify-icon{width:17px;height:17px;font-size:17px;}
   .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
   .hint{font-size:12px;color:#8a7f73;margin-top:4px;}
   #hidden{display:none;}
@@ -83,7 +83,10 @@
 <body>
 
 <header>
-  <h1>VSD Hub — Admin</h1>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="images/guru-logo.png" alt="" style="width:34px;height:34px;border-radius:50%;object-fit:cover;object-position:50% 30%;">
+    <h1>VSD Hub — Admin</h1>
+  </div>
   <div id="whoBox" style="display:none;" class="row" style="align-items:center;">
     <span class="who" id="whoEmail" style="margin-right:10px;"></span>
     <button id="signOutBtn">Sign out</button>
@@ -103,25 +106,48 @@
 </main>
 
 <script>
-// ====== CONFIGURE THESE ======
-const SUPABASE_URL = "https://npaikbbvarcsxykmogeo.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wYWlrYmJ2YXJjc3h5a21vZ2VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNTcxNzIsImV4cCI6MjA5OTkzMzE3Mn0.zwIfRfHttsYmATkl751GWa1VJE2qUgN5Jxq53tNYSpM";
-// ==============================
+// ---- CONFIGURE THIS ------------------------------------------------
+const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+// ---------------------------------------------------------------------
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   db: { schema: 'vsd_hub' }
 });
 const main = document.getElementById('main');
 const whoBox = document.getElementById('whoBox');
 const whoEmail = document.getElementById('whoEmail');
 
+// Valid Iconify (Material Design Icons) names — every entry here is
+// confirmed to exist under this exact name, unlike the old Lucide list.
 const COMMON_ICONS = [
-  'app-window','receipt','gift','users','user-check','monitor','clipboard-list','trophy','map-pin',
-  'truck','shopping-cart','heart','flame','book-open','award','star','gamepad-2','tv','mic','camera',
-  'image','badge-check','package','warehouse','calendar','list-checks','vote','dice-5','sparkles',
-  'landmark','building-2','bell','megaphone','ticket','wallet','banknote','handshake','folder',
-  'layout-grid','settings','id-card','scan-line','printer','send','shield-check','baby','crown'
+  'mdi:application-outline','mdi:receipt','mdi:gift','mdi:account-group','mdi:account-check','mdi:monitor',
+  'mdi:clipboard-text-outline','mdi:trophy','mdi:map-marker','mdi:truck','mdi:cart','mdi:heart','mdi:fire',
+  'mdi:book-open-variant','mdi:trophy-award','mdi:star','mdi:gamepad-variant','mdi:television','mdi:microphone',
+  'mdi:camera','mdi:image','mdi:check-decagram','mdi:package-variant','mdi:warehouse','mdi:calendar',
+  'mdi:format-list-checks','mdi:vote','mdi:dice-5','mdi:creation','mdi:bank','mdi:office-building','mdi:bell',
+  'mdi:megaphone','mdi:ticket','mdi:wallet','mdi:cash','mdi:handshake','mdi:folder','mdi:view-grid',
+  'mdi:cog','mdi:card-account-details','mdi:line-scan','mdi:printer','mdi:send','mdi:shield-check',
+  'mdi:baby-face-outline','mdi:crown'
 ];
+
+// Same translation table as index.html — old tiles saved before this
+// migration may still have bare Lucide-style names in the database.
+const LEGACY_ICON_MAP = {
+  'app-window':'mdi:application-outline','users':'mdi:account-group','user-check':'mdi:account-check',
+  'clipboard-list':'mdi:clipboard-text-outline','gamepad-2':'mdi:gamepad-variant','layout-grid':'mdi:view-grid',
+  'scan-line':'mdi:line-scan','id-card':'mdi:card-account-details','list-checks':'mdi:format-list-checks',
+  'badge-check':'mdi:check-decagram','banknote':'mdi:cash','baby':'mdi:baby-face-outline',
+  'building-2':'mdi:office-building','sparkles':'mdi:creation','award':'mdi:trophy-award','mic':'mdi:microphone',
+  'package':'mdi:package-variant','shopping-cart':'mdi:cart','flame':'mdi:fire','map-pin':'mdi:map-marker',
+  'landmark':'mdi:bank','settings':'mdi:cog','tv':'mdi:television','book-open':'mdi:book-open-variant',
+};
+function normalizeIcon(name){
+  let key = (name || 'mdi:application-outline').trim();
+  if(LEGACY_ICON_MAP[key]) return LEGACY_ICON_MAP[key];
+  if(key && !key.includes(':')) return 'mdi:' + key;
+  return key;
+}
 
 let allTiles = [];
 let currentUser = null;
@@ -166,7 +192,7 @@ document.getElementById('signOutBtn').addEventListener('click', async ()=>{
 async function init(){
   const { data: { user } } = await sb.auth.getUser();
   currentUser = user;
-  if(!user){ return; }
+  if(!user){ renderAuth(); return; }
 
   whoBox.style.display = 'flex';
   whoEmail.textContent = user.email;
@@ -216,7 +242,7 @@ function renderApp(){
   main.innerHTML = `
     <div class="toolbar">
       <div><strong>${allTiles.length}</strong> tiles across <strong>${categories().length}</strong> categories</div>
-      <button class="btn" id="addRootBtn"><i data-lucide="plus"></i> Add top-level tile</button>
+      <button class="btn" id="addRootBtn"><iconify-icon icon="mdi:plus"></iconify-icon> Add top-level tile</button>
     </div>
     <div id="treeRoot"></div>
   `;
@@ -238,7 +264,6 @@ function renderApp(){
     group.appendChild(tree);
     treeRoot.appendChild(group);
   });
-  lucide.createIcons();
 }
 
 function buildNode(tile){
@@ -248,17 +273,17 @@ function buildNode(tile){
   wrap.className = 'node';
   wrap.innerHTML = `
     <div class="node-row">
-      <div class="icon-wrap"><i data-lucide="${tile.icon}"></i></div>
+      <div class="icon-wrap"><iconify-icon icon="${normalizeIcon(tile.icon)}"></iconify-icon></div>
       <div class="info">
         <div class="name">${escapeHtml(tile.name)} <span class="badge ${isFolder?'folder':'leaf'}">${isFolder?'folder':'link'}</span></div>
         <div class="meta">${isFolder ? (kids.length + ' item' + (kids.length===1?'':'s') + ' inside') : escapeHtml(tile.url)}</div>
       </div>
       <div class="actions">
-        <button class="icon-btn" data-act="up" title="Move up"><i data-lucide="chevron-up"></i></button>
-        <button class="icon-btn" data-act="down" title="Move down"><i data-lucide="chevron-down"></i></button>
-        <button class="icon-btn" data-act="addchild" title="Add sub-tile"><i data-lucide="folder-plus"></i></button>
-        <button class="icon-btn" data-act="edit" title="Edit"><i data-lucide="pencil"></i></button>
-        <button class="icon-btn" data-act="delete" title="Delete"><i data-lucide="trash-2"></i></button>
+        <button class="icon-btn" data-act="up" title="Move up"><iconify-icon icon="mdi:chevron-up"></iconify-icon></button>
+        <button class="icon-btn" data-act="down" title="Move down"><iconify-icon icon="mdi:chevron-down"></iconify-icon></button>
+        <button class="icon-btn" data-act="addchild" title="Add sub-tile"><iconify-icon icon="mdi:folder-plus-outline"></iconify-icon></button>
+        <button class="icon-btn" data-act="edit" title="Edit"><iconify-icon icon="mdi:pencil-outline"></iconify-icon></button>
+        <button class="icon-btn" data-act="delete" title="Delete"><iconify-icon icon="mdi:trash-can-outline"></iconify-icon></button>
       </div>
     </div>
     <div class="children" id="children-${tile.id}"></div>
@@ -325,9 +350,9 @@ function openEditor(tileOrDraft, parentTileIfAny){
       </div>
       <div class="field">
         <label>Icon</label>
-        <input id="f_icon" value="${escapeHtml(tileOrDraft.icon||'app-window')}" placeholder="lucide icon name, e.g. trophy">
+        <input id="f_icon" value="${escapeHtml(normalizeIcon(tileOrDraft.icon))}" placeholder="e.g. mdi:trophy">
         <div class="icon-grid" id="iconGrid"></div>
-        <p class="hint">Browse all icon names at lucide.dev/icons — type any valid name above.</p>
+        <p class="hint">Browse the full set at icon-sets.iconify.design (mdi is used here for a consistent look) — type any valid "prefix:name" above.</p>
       </div>
       <p class="err" id="f_err"></p>
       <div class="modal-actions">
@@ -342,9 +367,8 @@ function openEditor(tileOrDraft, parentTileIfAny){
   const iconInput = overlay.querySelector('#f_icon');
   function paintGrid(){
     iconGrid.innerHTML = COMMON_ICONS.map(name =>
-      `<button type="button" data-icon="${name}" class="${iconInput.value===name?'selected':''}" title="${name}"><i data-lucide="${name}"></i></button>`
+      `<button type="button" data-icon="${name}" class="${iconInput.value===name?'selected':''}" title="${name}"><iconify-icon icon="${name}"></iconify-icon></button>`
     ).join('');
-    lucide.createIcons();
     iconGrid.querySelectorAll('button').forEach(b=>{
       b.addEventListener('click', ()=>{ iconInput.value = b.dataset.icon; paintGrid(); });
     });
@@ -359,7 +383,7 @@ function openEditor(tileOrDraft, parentTileIfAny){
     const errEl = overlay.querySelector('#f_err');
     const name = overlay.querySelector('#f_name').value.trim();
     const url = overlay.querySelector('#f_url').value.trim();
-    const icon = iconInput.value.trim() || 'app-window';
+    const icon = iconInput.value.trim() || 'mdi:application-outline';
     const categoryEl = overlay.querySelector('#f_category');
     const category = categoryEl ? categoryEl.value.trim() : null;
 
